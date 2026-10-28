@@ -1,0 +1,320 @@
+<!-- ... existing code ... -->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mumbai Vice Battlegrounds</title>
+<style>
+:root{--card:rgba(20,10,35,.85);--line:rgba(0,243,255,.3);--ink:#e0e0e0;--mut:#a89fbb;--teal:#00f3ff;--teal2:#ff007f;--tealbg:#2a114a;--red:#ff007f;--amber:#ffaa00;--sh:0 0 15px rgba(0,243,255,.2)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#110022;font-family:"Segoe UI",Inter,Roboto,Arial,sans-serif;color:var(--ink);user-select:none;font-size:13px}
+#gl{position:fixed;inset:0;width:100%;height:100%;display:block}
+button{font-family:inherit;cursor:pointer}
+.card{position:fixed;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh);backdrop-filter:blur(8px)}
+.hide{display:none!important}
+kbd{font-family:inherit;font-size:10.5px;background:#f1f5f9;border:1px solid #d7dde5;border-bottom-width:2px;border-radius:4px;padding:0 5px;color:#334155}
+/* top bar */
+#topbar{position:fixed;left:0;right:0;top:0;height:52px;background:rgba(15,5,25,.95);border-bottom:2px solid var(--teal2);display:flex;align-items:center;gap:10px;padding:0 14px;z-index:3;box-shadow:0 0 10px var(--teal2)}
+.brand{display:flex;align-items:center;gap:9px;min-width:170px}
+.brand b{display:block;font-size:14px;letter-spacing:1.5px;font-weight:800;color:var(--teal2);text-shadow:0 0 5px var(--teal2)}
+.brand small{display:block;font-size:9.5px;letter-spacing:1.6px;color:var(--teal);font-weight:600}
+.search{position:relative;flex:0 1 380px;display:flex;align-items:center;gap:8px;background:#2a114a;border:1px solid var(--teal);border-radius:9px;padding:0 10px;height:34px}
+.search input{border:0;background:transparent;outline:0;flex:1;font:inherit;color:#fff;min-width:60px}
+.qres{position:absolute;left:0;right:0;top:38px;background:rgba(20,10,35,.95);border:1px solid var(--teal2);border-radius:10px;box-shadow:var(--sh);overflow:hidden;display:none;z-index:9}
+.qres .r{display:flex;align-items:center;gap:9px;padding:8px 10px;border-bottom:1px solid #3a115a;cursor:pointer}
+.qres .r:hover,.qres .r.sel{background:#3a115a}
+.qres .r .ic{width:26px;height:26px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;flex:none}
+.qres .r .tx{flex:1;min-width:0}.qres .r .tx b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.qres .r .tx small{color:var(--mut)}
+.qres .r button{border:1px solid var(--teal);background:#2a114a;border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600;color:#fff}
+.qres .r button.go{background:var(--teal2);border-color:var(--teal2);color:#fff}
+.qres .empty{padding:10px;color:var(--mut)}
+.grow{flex:1}
+.pill{display:flex;align-items:center;gap:8px;border:1px solid var(--teal);border-radius:9px;padding:3px 10px 3px 4px;height:36px;background:#2a114a;min-width:0}
+.badge{background:var(--teal2);color:#fff;font-weight:700;font-size:10px;letter-spacing:.8px;border-radius:6px;padding:4px 7px;white-space:nowrap;box-shadow:0 0 8px var(--teal2)}
+.pill b{display:block;font-size:12.5px;white-space:nowrap;max-width:170px;overflow:hidden;text-overflow:ellipsis}.pill small{display:block;font-size:10.5px;color:var(--mut);white-space:nowrap}
+.live{display:flex;align-items:center;gap:6px;background:rgba(255,0,127,.2);color:#ff007f;border:1px solid #ff007f;border-radius:8px;padding:6px 10px;font-weight:600;white-space:nowrap}
+.live i{width:7px;height:7px;border-radius:50%;background:#ff007f;box-shadow:0 0 0 3px rgba(255,0,127,.25);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(255,0,127,0)}}
+.seg{display:flex;border:1px solid var(--teal);border-radius:8px;overflow:hidden;background:#2a114a}
+.seg button{border:0;background:transparent;padding:7px 10px;font-size:12px;color:var(--mut);font-weight:600}
+.seg button.on{background:var(--teal2);color:#fff}
+.tb{display:flex;align-items:center;gap:6px;border:1px solid var(--teal);background:#2a114a;border-radius:8px;padding:7px 10px;font-size:12px;font-weight:600;color:#fff;white-space:nowrap}
+.tb:hover{background:#3a115a}
+.tb.pri{background:var(--teal);border-color:var(--teal);color:#fff}
+.user{display:flex;align-items:center;gap:8px;padding-left:4px}
+.av{width:32px;height:32px;border-radius:50%;background:var(--teal2);color:#fff;display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}
+.user b{display:block;font-size:12.5px}.user small{display:block;font-size:10.5px;color:var(--mut)}
+/* stat cards */
+#cards{position:fixed;left:12px;top:62px;display:flex;gap:8px;z-index:2}
+.sc{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--sh);padding:8px 12px 8px 10px;display:flex;gap:9px;align-items:center;min-width:112px}
+.sc .ico{width:30px;height:30px;border-radius:8px;background:var(--tealbg);color:var(--teal);display:grid;place-items:center;flex:none}
+.sc .lb{font-size:10.5px;color:var(--mut);font-weight:600}
+.sc .vl{font-size:19px;font-weight:800;line-height:1.1;color:var(--teal);text-shadow:0 0 5px var(--teal)}.sc .vl small{font-size:11px;color:var(--mut);font-weight:600}
+.sc .sb{font-size:10px;color:var(--mut)}
+.sc .bar{height:4px;background:#3a115a;border-radius:3px;margin-top:3px;overflow:hidden;width:72px}.sc .bar i{display:block;height:100%;background:var(--teal2);border-radius:3px;transition:width .2s;box-shadow:0 0 5px var(--teal2)}
+#leftStack{position:fixed;left:12px;top:126px;width:min(440px,calc(50vw - 236px));min-width:300px;display:flex;flex-direction:column;gap:8px;z-index:2}
+#chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:11.5px;font-weight:600;color:#fff;box-shadow:0 2px 8px rgba(15,23,42,.08)}
+.chip i{width:7px;height:7px;border-radius:50%;background:#94a3b8}
+.chip:hover{background:#2a114a;border-color:var(--teal)}.chip.on{background:var(--teal2);color:#fff;border-color:var(--teal2)}.chip.on i{background:#fff}
+/* mission card */
+#missionCard{position:relative;width:320px;padding:11px 13px 12px;border-left:4px solid var(--amber);z-index:2}
+.mh{display:flex;justify-content:space-between;font-size:10.5px;font-weight:800;letter-spacing:.8px}
+.mh span:first-child{color:var(--amber)}.mh span:last-child{color:var(--teal)}
+#mTitle{font-size:15px;font-weight:800;margin:4px 0 4px;color:var(--teal2)}
+#mObj{font-size:12px;color:#fff;line-height:1.45}
+#mObj b{color:var(--teal)}
+.mrow{display:flex;gap:6px;align-items:center;margin-top:9px}
+.btn{border:1px solid var(--teal);background:#2a114a;border-radius:8px;padding:6px 10px;font-size:11.5px;font-weight:600;color:#fff}
+.btn:hover{background:#3a115a}.btn.pri{background:var(--teal2);border-color:var(--teal2);color:#fff}.btn.pri:hover{background:#cc0066}
+/* ... existing code ... */
+/* big map */
+#mapOv{position:fixed;inset:0;display:none;background:rgba(15,23,42,.45);z-index:6;padding:64px 18px 18px}
+.mapPanel{width:100%;height:100%;background:#1a0b2e;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;overflow:hidden;color:#fff}
+.mapHead{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--teal)}
+.mapHead .btn{white-space:nowrap}
+/* ... existing code ... */
+.mapSide{position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:6px}
+.mapSide button{width:36px;height:36px;border-radius:9px;border:1px solid var(--teal);background:#2a114a;font-size:16px;font-weight:700;color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.legend{position:absolute;left:12px;bottom:12px;background:rgba(20,10,35,.95);border:1px solid var(--teal);border-radius:10px;padding:8px 11px;font-size:11px;display:grid;grid-template-columns:auto auto;gap:3px 14px;box-shadow:0 2px 10px rgba(0,0,0,.1);color:#fff}
+.legend span{display:flex;align-items:center;gap:6px;color:#fff}.legend i{width:14px;height:4px;border-radius:2px;display:inline-block}
+.mapFoot{display:flex;justify-content:space-between;padding:7px 14px;font-size:11.5px;color:var(--mut);border-top:1px solid var(--teal)}
+/* menu */
+#menu{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;background:rgba(15,5,25,.72);backdrop-filter:blur(6px)}
+#menu .box{width:min(920px,94vw);max-height:94vh;overflow:auto;padding:26px 30px;background:#1a0b2e;border-radius:16px;box-shadow:0 24px 70px rgba(0,243,255,.25);border-top:5px solid var(--teal2);color:#fff}
+#menu h1{font-size:30px;letter-spacing:1px;font-weight:900;display:flex;align-items:center;gap:12px}
+#menu h1 span{color:var(--teal2);text-shadow:0 0 8px var(--teal2)}
+#menu .sub{color:var(--mut);margin:4px 0 18px;font-size:13.5px}
+#menu .cols{display:grid;grid-template-columns:1.1fr 1fr;gap:22px}
+#menu h3{color:var(--teal);font-size:11px;letter-spacing:1.5px;margin:0 0 6px;font-weight:800}
+#menu .ctl{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:12.5px;margin-bottom:12px;align-items:center}
+#menu .ctl span:nth-child(odd){white-space:nowrap}
+#mlist{display:flex;flex-direction:column;gap:5px}
+#mlist button{display:flex;align-items:center;gap:10px;border:1px solid var(--teal);background:#2a114a;border-radius:9px;padding:7px 10px;text-align:left;font-size:12.5px;font-weight:600;color:#fff}
+#mlist button:hover{border-color:var(--teal2);background:#3a115a}
+#mlist button i{width:22px;height:22px;border-radius:50%;background:var(--tealbg);color:var(--teal);display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:800;flex:none}
+#menu .foot{display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap}
+#play{background:var(--teal2);color:#fff;border:0;padding:12px 34px;font-size:15px;font-weight:800;letter-spacing:1.5px;border-radius:10px;box-shadow:0 0 15px var(--teal2)}
+#play:disabled{opacity:.6;cursor:wait;box-shadow:none}
+#load{color:var(--mut);font-size:12.5px}
+#menu label{font-size:12.5px;color:#fff;display:flex;align-items:center;gap:8px}
+@media (max-width:1250px){#chips{display:none}.user div,.brand div small{display:none}}
+/* ... existing code ... */
+<header id="topbar">
+  <div class="brand">
+    <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 2 3 7v10l9 5 9-5V7z" fill="#00f3ff"/><path d="M12 12 3 7m9 5 9-5m-9 5v10" stroke="#ff007f" stroke-width="1.4" fill="none"/></svg>
+    <div><b>MUMBAI VICE</b><small>BATTLEGROUNDS</small></div>
+  </div>
+  <div class="search" id="sbox">
+/* ... existing code ... */
+<div id="menu"><div class="box">
+  <h1><svg width="36" height="36" viewBox="0 0 24 24"><path d="M12 2 3 7v10l9 5 9-5V7z" fill="#00f3ff"/><path d="M12 12 3 7m9 5 9-5m-9 5v10" stroke="#ff007f" stroke-width="1.4" fill="none"/></svg>MUMBAI VICE <span>BATTLEGROUNDS</span></h1>
+  <div class="sub">Open-world Mumbai: Kurla to Colaba, the Sea Link, crowded local trains and the Elephanta ferry.</div>
+/* ... existing code ... */
+  } else if(mat>1.5 && mat<2.5 && abs(n.y)<0.5){
+    vec2 g=vUV/vec2(2.6,3.6); vec2 f=fract(g); float fr=step(0.07,f.x)*step(0.08,f.y);
+    float fres=pow(1.-max(dot(n,V),0.),4.);
+    vec3 sky=skyRefl(reflect(-V,n));
+    float r=h21(floor(g)+floor(vW.xz*0.013)*11.);
+    emis=fr*(sky*(0.22+0.55*fres)*(1.-uNight*0.85)) + fr*step(0.62,r)*uNight*vec3(0.85,0.85,0.75)*0.8;
+    base=mix(base*0.45+0.06,base*(0.32+0.06*r),fr); spec=fr*1.6;
+  } else if(mat>2.5 && mat<3.5){
+    vec3 eCol = base*(1.5 + uNight*2.0);
+    o=vec4(grade(applyFog(eCol,vW)),uAlpha); return;
+  } else if(mat>6.5 && mat<7.5){
+    float nz=vnoise(vW.xz*0.9+vW.y*0.7)*0.6+vnoise(vec2(vW.x+vW.z,vW.y)*3.1)*0.4;
+/* ... existing code ... */
+const WATER = (() => {
+  const vao = gl.createVertexArray(); gl.bindVertexArray(vao);
+  const N = 64, S = 9000, P = [], I = [];
+  for (let j = 0; j <= N; j++) for (let i = 0; i <= N; i++) { const u = i / N * 2 - 1, v = j / N * 2 - 1; const f = x => Math.sign(x) * Math.pow(Math.abs(x), 2.2); P.push(f(u) * S, -0.45, f(v) * S); }
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) { const a = j * (N + 1) + i; I.push(a, a + 1, a + N + 2, a, a + N + 2, a + N + 1); }
+  const b = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, b); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(P), gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(0); gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
+  const ib = gl.createBuffer(); gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib); gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint32Array(I), gl.STATIC_DRAW);
+  gl.bindVertexArray(null); return { vao, count: I.length };
+})();
+const SKYVAO = gl.createVertexArray();
+
+const TIMES = [
+  { name: 'Day', sun: [-0.45, 0.72, 0.52], sunCol: [1.12, 1.04, 0.9], sky: [0.55, 0.62, 0.72], gnd: [0.4, 0.37, 0.32], fog: [0.76, 0.78, 0.78], zen: [0.33, 0.54, 0.8], fogD: 0.00042, night: 0, shA: 0.3 },
+  { name: 'Dusk', sun: [-0.9, 0.15, 0.38], sunCol: [1.8, 0.4, 0.8], sky: [0.6, 0.2, 0.5], gnd: [0.2, 0.1, 0.3], fog: [0.8, 0.3, 0.6], zen: [0.4, 0.1, 0.7], fogD: 0.00046, night: 0.6, shA: 0.24 },
+  { name: 'Night', sun: [0.35, 0.6, -0.45], sunCol: [0.1, 0.3, 0.5], sky: [0.05, 0.02, 0.15], gnd: [0.02, 0.01, 0.05], fog: [0.05, 0.0, 0.1], zen: [0.0, 0.0, 0.05], fogD: 0.0005, night: 1, shA: 0.12 }
+];
+let timeIdx = 0;
+// ================= GEOGRAPHY (scaled Mumbai) =================
+/* ... existing code ... */
+function collideCircle(x, z, r, y, h = 1.8) {
+  let hit = false; const seen = new Set();
+  for (let ix = Math.floor((x - r) / CS); ix <= Math.floor((x + r) / CS); ix++) for (let iz = Math.floor((z - r) / CS); iz <= Math.floor((z + r) / CS); iz++) {
+    const a = CGRID.get(ck(ix, iz)); if (!a) continue;
+    for (const id of a) {
+      if (seen.has(id)) continue; seen.add(id);
+      const c = COLS[id]; if (y >= c[4] - 0.3 || y + h < c[5]) continue;
+      const nx = clamp(x, c[0], c[2]), nz = clamp(z, c[1], c[3]);
+      let dx = x - nx, dz = z - nz; const d = Math.hypot(dx, dz);
+      if (d < r) {
+        hit = true;
+        if (d > 1e-4) { x = nx + dx / d * r; z = nz + dz / d * r; }
+        else { const l = x - c[0], rt = c[2] - x, t = z - c[1], b = c[3] - z; const m = Math.min(l, rt, t, b); if (m === l) x = c[0] - r; else if (m === rt) x = c[2] + r; else if (m === t) z = c[1] - r; else z = c[3] + r; }
+      }
+    }
+  }
+  return [x, z, hit];
+}
+
+// ================= WORLD GEOMETRY =================
+const WG = new GB();
+const BUILDINGS = [], TREES = [], STALLS = [], PUB_LOCS = [];
+const PAL = {
+  heritage: ['#e3d5b5', '#d8b980', '#e2cf96', '#cdbd9f', '#d9c7a7', '#c9a57a', '#e8e0cc'],
+  mixed: ['#e7e2d6', '#d6d0c1', '#efe8d4', '#c7d1d6', '#e5cdbd', '#d3dac7', '#cfc8b8', '#e9dfc2', '#bfc6cc', '#d9cfc0'],
+/* ... existing code ... */
+function blockedLot(x, z, r) {
+  if (x > AIRPORT.x0 - r && x < AIRPORT.x1 + r && z > AIRPORT.z0 - r && z < AIRPORT.z1 + r) return true;
+  for (const s of SEGS) { if (segDist(x, z, s[0], s[1], s[2], s[3])[0] < s[4] + r) return true; }
+  for (const p of PARKS) if (inEll(x, z, [p[0], p[1], p[2] + r, p[3] + r])) return true;
+  for (const e of EXCL) if (Math.hypot(x - e[0], z - e[1]) < e[2] + r) return true;
+  return false;
+}
+function building(x0, z0, x1, z1, h, col, mat, roofCol, y0 = 0) {
+  WG.aabb(x0, y0, z0, x1, h, z1, col, mat, true, roofCol || col.map(v => v * 0.82));
+  if (y0 === 0) addCol(x0, z0, x1, z1, h); else addCol(x0, z0, x1, z1, h, y0);
+  BUILDINGS.push([x0, z0, x1, z1, h]);
+}
+// box on a building side: a = along wall from start corner, o = outward distance
+/* ... existing code ... */
+  else if (zone === 'east') { h = rnd() < 0.12 ? rr(35, 80) : rr(6, 22); col = hex(pick(PAL.mixed), v); }
+  else { const r = rnd(); h = r < 0.12 ? rr(45, 110) : r < 0.5 ? rr(14, 32) : rr(7, 16); col = hex(pick(PAL.mixed), v); if (h > 45 && rnd() < 0.4) { mat = 2; col = hex(pick(PAL.tower), v); } }
+  const deco = zone !== 'bkc' && nearMD((x0 + x1) / 2, (z0 + z1) / 2);
+  if (deco) { h = rr(16, 27); col = hex(pick(DECO), v); mat = 1; }
+  
+  const isPub = (zone === 'mixed' || zone === 'tower') && h > 10 && w > 12 && d > 12 && rnd() < 0.15;
+  if (isPub) {
+    const gh = 3.5, wt = 0.4, dw = 2.4, cx = (x0+x1)/2, cz = (z0+z1)/2;
+    WG.aabb(x0, 0, z0, x1, gh, z0+wt, col, mat); addCol(x0, z0, x1, z0+wt, gh);
+    WG.aabb(x0, 0, z1-wt, x1, gh, z1, col, mat); addCol(x0, z1-wt, x1, z1, gh);
+    WG.aabb(x0, 0, z0+wt, x0+wt, gh, z1-wt, col, mat); addCol(x0, z0+wt, x0+wt, z1-wt, gh);
+    WG.aabb(x1-wt, 0, z0+wt, x1, gh, cz-dw/2, col, mat); addCol(x1-wt, z0+wt, x1, cz-dw/2, gh);
+    WG.aabb(x1-wt, 0, cz+dw/2, x1, gh, z1-wt, col, mat); addCol(x1-wt, cz+dw/2, x1, z1-wt, gh);
+    WG.aabb(x1-wt, gh-0.8, cz-dw/2, x1, gh, cz+dw/2, col, mat);
+    WG.aabb(x0+wt, gh-0.2, z0+wt, x1-wt, gh, z1-wt, hex('#222'), 0, false);
+    WG.aabb(x0+wt, 0, z0+wt, x1-wt, 0.1, z1-wt, hex('#333'), 0, false);
+    WG.aabb(cx-2, 0, cz+1, cx+2, 1.1, cz+2, hex('#00f3ff')); addCol(cx-2, cz+1, cx+2, cz+2, 1.1);
+    WG.aabb(x0+wt+0.05, 1.5, cz-1.5, x0+wt+0.15, 2.5, cz+1.5, hex('#ff007f'), 3);
+    WG.aabb(cx-1, 1.5, z0+wt+0.05, cx+1, 2.0, z0+wt+0.15, hex('#00f3ff'), 3);
+    PUB_LOCS.push([cx, cz]);
+    building(x0, z0, x1, z1, h, col, mat, null, gh);
+  } else {
+    building(x0, z0, x1, z1, h, col, mat);
+  }
+  
+  decorate(zone, x0, z0, x1, z1, h, col, mat, deco);
+  if (h < 45 && mat === 1 && edges.length && rnd() < 0.75) shopfront(x0, z0, x1, z1, edges[0]);
+  if (h < 45 && mat === 1 && edges.length > 1 && rnd() < 0.3) shopfront(x0, z0, x1, z1, edges[1]);
+  if (h > 12 && h < 40 && rnd() < 0.045) hoarding(x0, z0, x1, z1, h);
+/* ... existing code ... */
+// ---------- enemies ----------
+const ENAMES = ['Bhai', 'Tiger', 'Pakya', 'Raju', 'Munna', 'Circuit', 'Shakaal', 'Kaalia', 'Gabbar', 'Teja', 'Mogambo', 'Daaku', 'Langda', 'Chhota', 'Bunty', 'Golu'];
+function spawnEnemy(x, z, tag, radius = 25) {
+  const [fx, fz, fy] = findFree(x, z, 0.5);
+  const e = { x: fx, z: fz, y: fy, yaw: rnd() * 6.28, hp: 100, alive: true, deadT: 0, home: [fx, fz], tgt: null, alert: 0, los: false, losT: rnd(), fireCd: 1, burst: 0, phase: 0, moving: 0, tag, radius, name: pick(ENAMES) + '_' + Math.floor(rr(10, 99)), strafe: rnd() < 0.5 ? 1 : -1, col: hex(pick(['#7a1f1f', '#2b2b2b', '#4a3b2a', '#3a4a5a'])), skin: rr(0.15, 0.6), coverT: 0, crouch: false };
+  ENEMIES.push(e); return e;
+}
+function killEnemy(e, how) {
+/* ... existing code ... */
+  if (dist > 420) return;
+  e.losT -= dt;
+  if (e.losT <= 0) {
+    e.losT = 0.3 + rnd() * 0.25;
+    const py = P.mode === 'car' ? P.veh.y + 1.2 : P.y + (P.crouch ? 0.9 : 1.3);
+    e.los = playerTargetable() && dist < 105 && hasLOS(e.x, e.y + 1.5, e.z, P.x, py, P.z);
+    if (e.los) e.alert = 7;
+  }
+  e.alert -= dt;
+  e.coverT = Math.max(0, e.coverT - dt);
+  const inCover = e.coverT > 0;
+  e.crouch = inCover && e.moving < 1;
+  let mvx = 0, mvz = 0, sp = 0;
+  if (e.alert > 0 && playerTargetable()) {
+    const ty = Math.atan2(dx, -dz); e.yaw += angDiff(e.yaw, ty) * Math.min(1, dt * 8);
+    const fx = dx / dist, fz = dz / dist;
+    if (inCover) {
+      mvx = -fz * e.strafe * 1.5 - fx * 0.5; mvz = fx * e.strafe * 1.5 - fz * 0.5; sp = 4.8;
+    } else if (!e.los || dist > 45) { 
+      mvx = fx; mvz = fz; sp = 3.8; 
+    } else if (dist < 10) { 
+      mvx = -fx; mvz = -fz; sp = 2.5; 
+    } else { 
+      mvx = -fz * e.strafe; mvz = fx * e.strafe; sp = 2.2; 
+      if (rnd() < dt * 0.4) e.strafe *= -1; 
+    }
+    if (inCover) e.fireCd += dt * 0.3;
+    e.fireCd -= dt;
+    if (e.los && e.fireCd <= 0) {
+      if (e.burst <= 0) e.burst = 3 + Math.floor(rnd() * 3);
+/* ... existing code ... */
+  const pd = Math.hypot(camPos[0] - P.x, camPos[2] - P.z) + 0.6;
+  const o = [camPos[0] + d[0] * pd, camPos[1] + d[1] * pd, camPos[2] + d[2] * pd];
+  let tHit = 600, hitE = null, head = false;
+  for (let t = 0; t < 600; t += 0.6) { const x = o[0] + d[0] * t, y = o[1] + d[1] * t, z = o[2] + d[2] * t; if (pointBlocked(x, y, z) || (y < 70 && y < surface(x, z) - (SURF.water ? -0.6 : 0))) { tHit = t; break; } }
+  for (const e of ENEMIES) {
+    if (!e.alive || Math.hypot(e.x - P.x, e.z - P.z) > 600) continue;
+    const th = raySphere(o, d, [e.x, e.y + 1.65, e.z], 0.2); if (th > 0 && th < tHit) { tHit = th; hitE = e; head = true; }
+    for (const c of [[e.y + 1.18, 0.38], [e.y + 0.6, 0.34]]) { const tb = raySphere(o, d, [e.x, c[0], e.z], c[1]); if (tb > 0 && tb < tHit) { tHit = tb; hitE = e; head = false; } }
+  }
+  const hp = [o[0] + d[0] * tHit, o[1] + d[1] * tHit, o[2] + d[2] * tHit];
+  let muzzle;
+  if (fp) { const cd = camDir(), r = [Math.cos(camYaw), 0, Math.sin(camYaw)]; muzzle = [camPos[0] + cd[0] * 0.9 + r[0] * (mouseR ? 0 : 0.14), camPos[1] + cd[1] * 0.9 - (mouseR ? 0.07 : 0.15), camPos[2] + cd[2] * 0.9 + r[2] * (mouseR ? 0 : 0.14)]; }
+  else { const f = fwd(P.yaw), r = [Math.cos(P.yaw), 0, Math.sin(P.yaw)]; muzzle = [P.x + f[0] * 1.0 + r[0] * 0.06, P.y + (P.crouch ? 1.0 : 1.4), P.z + f[2] * 1.0 + r[2] * 0.06]; }
+  FX.push({ type: 'tracer', a: muzzle, b: hp, t: 0, life: 0.06, col: [1, 0.95, 0.6] });
+  if (!isScoped()) FX.push({ type: 'flash', a: muzzle, t: 0, life: 0.05 });
+  if (!hitE && tHit < 600) FX.push({ type: 'puff', a: hp, t: 0, life: 0.35 });
+  if (hitE) { hitE.hp -= head ? W.head : W.dmg; hitE.alert = 8; FX.push({ type: 'blood', a: hp, t: 0, life: 0.3 }); if (hitE.hp <= 0) killEnemy(hitE, head ? 'head' : 'shot'); else { hitmark(false); hitE.coverT = 4.0; } }
+  for (const e of ENEMIES) if (e.alive && Math.hypot(e.x - P.x, e.z - P.z) < (W.id === 'kar98k' ? 120 : 70)) e.alert = Math.max(e.alert, 4);
+  if (rnd() < 0.3) crowdPanic(P.x, P.z, 55);
+  camPitch += mouseR ? W.kick * 0.55 : W.kick; camYaw += rr(-0.004, 0.004) * (W.kick / 0.009); vmKick = 1;
+}
+/* ... existing code ... */
+  renderCrowd();
+  for (const e of ENEMIES) { if (!near(e.x, e.z, 260) || e.deadT > 25) continue; queueHuman(e.x, e.y, e.z, e.yaw, e.phase, e.moving, { top: e.col, bottom: hex('#2d2f33'), hair: hex('#b3261e'), skin: e.skin, gun: true, dead: !e.alive, deadT: e.deadT, aimP: e.alert > 0 ? -0.05 : -0.5, crouch: e.crouch }); }
+  const pc = { top: P.armor > 0 ? hex('#3f4a37') : hex('#5a6440'), bottom: hex('#2f4a6b'), hair: hex('#1a1410'), skin: 0.45 };
+  if ((P.mode === 'foot' && !isFP()) || P.mode === 'dead') queueHuman(P.x, P.y - (P.swim ? 0.9 : 0), P.z, P.yaw, P.phase, P.moving, { ...pc, gm: WMESH[curW().id], gun: !P.swim && swapT <= 0, crouch: P.crouch, dead: P.mode === 'dead', deadT: P.deadT, aimP: (mouseR || mouseL) ? camPitch : -0.5 });
+/* ... existing code ... */
+// ================= CROWDS =================
+const PEDS = [];
+const NM = ['Rahul', 'Amit', 'Suresh', 'Vikas', 'Prakash', 'Sachin', 'Imran', 'Joseph', 'Ganesh', 'Mahesh', 'Nitin', 'Sandeep', 'Arjun', 'Faisal', 'Rohan', 'Kiran', 'Vijay', 'Anil', 'Tushar', 'Aakash', 'Deepak', 'Yusuf'];
+const NF = ['Priya', 'Sneha', 'Anjali', 'Pooja', 'Kavita', 'Sunita', 'Fatima', 'Meera', 'Neha', 'Asha', 'Lata', 'Ritu', 'Shruti', 'Nisha', 'Rekha', 'Sana', 'Aarti', 'Swati'];
+const SURN = ['Patil', 'Shinde', 'Jadhav', 'Pawar', 'Shaikh', 'Khan', 'Iyer', "D'Souza", 'Mehta', 'Shah', 'Gupta', 'More', 'Kulkarni', 'Naik', 'Deshmukh', 'Sawant', 'Fernandes', 'Joshi', 'Rao', 'Kamble'];
+const ROLES = ['Commuter', 'Office-goer', 'Student', 'Street vendor', 'Tourist', 'Dabbawala', 'Shopkeeper', 'Auto driver', 'College student', 'Banker', 'Software engineer', 'Nurse', 'Delivery rider', 'Clubber', 'Vice Synth Fan'];
+const TALK = ['Bhau, next fast local kitne baje hai?', 'Arre, traffic bahut hai aaj!', 'Vada pav khaoge? Best one is near the station.', 'Chalo, late ho raha hai.', 'Ganpati Bappa Morya!', 'Ekdum jhakaas weather today.', 'Mumbai meri jaan!', 'Ticket counter line is too long, use the app.', 'Looks like the rain is coming.', 'Ek cutting chai, please!', 'The station is straight ahead, then left.', 'Careful, gang trouble near Dharavi.', 'The Elephanta ferry leaves from the Gateway.', 'Kya scene hai, boss?', 'Aesthetic neon vibes tonight.', 'I heard there is a Vice City party at the club.'];
+const SHIRT_M = ['#f4f4f0', '#dfe8f2', '#a9c4e0', '#7f9fbf', '#e8d9b8', '#c9d6c0', '#3b4a6b', '#8a3b3b', '#5d6d4e', '#d9b44a', '#f0e6d2', '#6b7c93', '#b85c38', '#ffffff', '#cfd8dc', '#ef9a9a'].map(c => hex(c));
+/* ... existing code ... */
+  spawnMill(...H(72.8420, 19.0170), 30, 70); spawnMill(...H(72.8340, 18.9475), 26, 60); spawnMill(...H(72.8350, 19.0640), 30, 60);
+  spawnMill(DHARAVI[0], DHARAVI[1], 70, 90); spawnMill(...H(72.8302, 19.0175), 18, 40); spawnMill(...H(72.8790, 19.0640), 30, 50);
+  for (const t of [0.15, 0.4, 0.65, 0.9]) spawnMill(lerp(EJETTY.a[0] + 4, CAVE.x - 26, t), lerp(EJETTY.a[1], CAVE.z, t), 9, 12);
+  spawnMill(CAVE.x - 16, CAVE.z, 7, 14);
+  for (const s of STALLS) { const p = makePed('stand'); p.x = s[0] - Math.sin(s[2]) * 1.2; p.z = s[1] + Math.cos(s[2]) * 1.2; p.y = 0; p.yaw = s[2]; p.state = 'idle'; p.home = [p.x, p.z, 1]; p.role = 'Street vendor'; p.talk = pick(['Vada pav, garam garam!', 'Fresh coconut water, only ₹40!', 'Pav bhaji, best in Mumbai!', 'Bhutta le lo, bhutta!', 'Chai, cutting chai!']); }
+  const md = ARTS[0].p; spawnPath(md, 130, -12.8, -11.2);
+  spawnPath([[HAJI.shore - 6, HAJI.z], [HAJI.x - 9, HAJI.z]], 30, -1.2, 1.2);
+  for (const loc of PUB_LOCS) {
+    spawnMill(loc[0], loc[1], 3, 4, {stand: true, yaw: rnd()*6.28});
+    const bt = makePed('stand');
+    bt.x = loc[0]; bt.z = loc[1] + 2.4; bt.y = 0; bt.yaw = Math.PI; bt.role = 'Bartender'; bt.talk = pick(['Neon vibes tonight!', 'Keep it down, cops outside.', 'What can I get ya?']);
+    bt.state = 'idle'; bt.home = [bt.x, bt.z, 1];
+  }
+}
+let panicAt = null;
+/* ... existing code ... */
+let mmT = 0; const CHAT = []; let chatNext = 5, chatDirty = true, hudT = 0;
+const AMBIENT = [
+  ['Traffic Police', 'Heavy traffic on LBS Marg near Kurla — expect delays.'], ['Western Railway', 'Churchgate-bound fast local arriving on platform 3.'],
+  ['Central Railway', 'CSMT slow local running 4 minutes late.'], ['BEST Control', 'Route 1 bus diverted near Colaba Causeway.'],
+  ['Ferry Desk', 'Elephanta launches every few minutes from Apollo Bunder.'], ['IMD Mumbai', 'Humid, 31°C, light sea breeze along Marine Drive.'],
+  ['Coast Guard', 'Fishing fleet returning to Sassoon Dock.'], ['BMC', 'Water-logging cleared at Hindmata junction.'],
+  ['Sea Link Control', 'Traffic moving smoothly on the Bandra–Worli Sea Link.'], ['Airport ATC', 'Runway 09 active, cargo traffic only.'],
+  ['Police Control', 'Gang activity reported in Dharavi — avoid the inner lanes.'], ['Dabbawala Union', 'All lunch dabbas delivered on time today.'],
+  ['Traffic Police', 'Slow-moving traffic at Sion circle.'], ['Western Railway', 'Dadar crowd heavy — use the north foot-over-bridge.'],
+  ['Vice Radio', 'Playing the best synthwave hits of 1986, right here in Mumbai.'], ['Club Neon', 'Tonight: Cyber-Bhangra night! Entry ₹2000.'], ['Police Control', 'Suspect spotted leaving the neon club in Bandra.']
+];
+const pad = n => (n < 10 ? '0' : '') + n;
+/* ... existing code ... */
